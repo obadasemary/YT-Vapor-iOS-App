@@ -71,4 +71,49 @@ final class SongRepository: SongRepositoryProtocol {
         
         return song
     }
+
+    /// Updates an existing song via the API
+    /// - Parameters:
+    ///   - id: The unique identifier of the song to update
+    ///   - title: The new song title
+    ///   - artist: The new artist name
+    /// - Returns: The updated Song domain entity
+    /// - Throws: NetworkError if the request fails or URL is invalid
+    func updateSong(id: UUID, title: String, artist: String) async throws -> Song {
+        let songEndpoint = APIEndpoint.song(id: id)
+        guard let url = songEndpoint.url else {
+            print("❌ Failed to create URL for song update")
+            throw NetworkError.invalidURL
+        }
+
+        print("✅ Updating song at URL: \(url.absoluteString)")
+
+        let updateDTO = UpdateSongDTO(title: title, artist: artist)
+        let responseDTO: SongDTO = try await httpClient.put(updateDTO, to: url)
+
+        print("✅ Successfully updated song: \(responseDTO.title)")
+
+        guard let song = responseDTO.toDomain() else {
+            throw NetworkError.decodingError
+        }
+
+        return song
+    }
+
+    /// Deletes a song via the API
+    /// - Parameter id: The unique identifier of the song to delete
+    /// - Throws: NetworkError if the request fails or URL is invalid
+    func deleteSong(id: UUID) async throws {
+        let songEndpoint = APIEndpoint.song(id: id)
+        guard let url = songEndpoint.url else {
+            print("❌ Failed to create URL for song deletion")
+            throw NetworkError.invalidURL
+        }
+
+        print("✅ Deleting song at URL: \(url.absoluteString)")
+
+        try await httpClient.delete(from: url)
+
+        print("✅ Successfully deleted song with ID: \(id)")
+    }
 }
