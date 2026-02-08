@@ -106,13 +106,16 @@ struct AddSongView: View {
 // MARK: - Mock Repository for Preview
 
 private final class MockSongRepository: SongRepositoryProtocol {
-    func fetchSongs() async throws -> [Song] {
-        []
-    }
-    
+    func fetchSongs() async throws -> [Song] { [] }
+
     func createSong(title: String, artist: String) async throws -> Song {
-        // Simulate network delay
         try await Task.sleep(for: .seconds(1))
         return Song(id: UUID(), title: title, artist: artist)
     }
+
+    func updateSong(id: UUID, title: String, artist: String) async throws -> Song {
+        Song(id: id, title: title, artist: artist)
+    }
+
+    func deleteSong(id: UUID) async throws {}
 }
