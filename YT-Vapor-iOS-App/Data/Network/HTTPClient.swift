@@ -19,4 +19,17 @@ protocol HTTPClient {
     /// - Returns: A decoded object of type T
     /// - Throws: NetworkError if the operation fails
     func post<T: Decodable, U: Encodable>(_ data: U, to url: URL) async throws -> T
+
+    /// Puts (updates) data at a URL and decodes the response
+    /// - Parameters:
+    ///   - data: The encodable data to send
+    ///   - url: The URL to put to
+    /// - Returns: A decoded object of type T
+    /// - Throws: NetworkError if the operation fails
+    func put<T: Decodable, U: Encodable>(_ data: U, to url: URL) async throws -> T
+
+    /// Deletes a resource at a URL
+    /// - Parameter url: The URL to delete from
+    /// - Throws: NetworkError if the operation fails
+    func delete(from url: URL) async throws
 }
