@@ -47,4 +47,28 @@ final class MockHTTPClient: HTTPClient {
             throw error
         }
     }
+
+    /// Mocked put implementation
+    func put<T: Decodable, U: Encodable>(_ data: U, to url: URL) async throws -> T {
+        switch result {
+        case .success(let responseData):
+            guard let typedData = responseData as? T else {
+                throw NetworkError.decodingError
+            }
+            return typedData
+
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    /// Mocked delete implementation
+    func delete(from url: URL) async throws {
+        switch result {
+        case .success:
+            return
+        case .failure(let error):
+            throw error
+        }
+    }
 }
