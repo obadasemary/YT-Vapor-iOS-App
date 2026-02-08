@@ -13,7 +13,7 @@ struct GetSongsUseCaseTests {
             Song(id: UUID(), title: "Test Song 2", artist: "Artist 2")
         ]
         let mockRepository = MockSongRepository(returning: mockSongs)
-        let useCase = GetSongsUseCase(repository: mockRepository)
+        let useCase = await GetSongsUseCase(repository: mockRepository)
 
         let songs = try await useCase.execute()
 
@@ -26,7 +26,7 @@ struct GetSongsUseCaseTests {
     func testExecutePropagatesErrors() async {
         let expectedError = NetworkError.noData
         let mockRepository = MockSongRepository(throwing: expectedError)
-        let useCase = GetSongsUseCase(repository: mockRepository)
+        let useCase = await GetSongsUseCase(repository: mockRepository)
 
         do {
             _ = try await useCase.execute()
@@ -39,7 +39,7 @@ struct GetSongsUseCaseTests {
     @Test("Execute returns empty array when repository returns empty")
     func testExecuteReturnsEmptyArray() async throws {
         let mockRepository = MockSongRepository(returning: [])
-        let useCase = GetSongsUseCase(repository: mockRepository)
+        let useCase = await GetSongsUseCase(repository: mockRepository)
 
         let songs = try await useCase.execute()
 
@@ -50,7 +50,7 @@ struct GetSongsUseCaseTests {
     func testExecuteMultipleTimes() async throws {
         let mockSongs = [Song(id: UUID(), title: "Test", artist: "Artist")]
         let mockRepository = MockSongRepository(returning: mockSongs)
-        let useCase = GetSongsUseCase(repository: mockRepository)
+        let useCase = await GetSongsUseCase(repository: mockRepository)
 
         let firstResult = try await useCase.execute()
         let secondResult = try await useCase.execute()

@@ -10,7 +10,7 @@ struct DeleteSongUseCaseTests {
     func testDeleteSongSuccess() async throws {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = DeleteSongUseCase(repository: mockRepository)
+        let useCase = await DeleteSongUseCase(repository: mockRepository)
         let songId = UUID()
 
         // When
@@ -25,7 +25,7 @@ struct DeleteSongUseCaseTests {
     func testDeleteSongFailure() async {
         // Given
         let mockRepository = MockSongRepository(shouldFail: true)
-        let useCase = DeleteSongUseCase(repository: mockRepository)
+        let useCase = await DeleteSongUseCase(repository: mockRepository)
 
         // When/Then
         await #expect(throws: (any Error).self) {

@@ -18,7 +18,7 @@ struct CreateSongUseCaseTests {
     func testCreateSongSuccess() async throws {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = CreateSongUseCase(repository: mockRepository)
+        let useCase = await CreateSongUseCase(repository: mockRepository)
         let title = "Bohemian Rhapsody"
         let artist = "Queen"
         
@@ -35,7 +35,7 @@ struct CreateSongUseCaseTests {
     func testTrimWhitespace() async throws {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = CreateSongUseCase(repository: mockRepository)
+        let useCase = await CreateSongUseCase(repository: mockRepository)
         let title = "  Bohemian Rhapsody  "
         let artist = "  Queen  "
         
@@ -53,7 +53,7 @@ struct CreateSongUseCaseTests {
     func testEmptyTitle() async {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = CreateSongUseCase(repository: mockRepository)
+        let useCase = await CreateSongUseCase(repository: mockRepository)
         
         // When/Then
         await #expect(throws: ValidationError.emptyTitle) {
@@ -66,7 +66,7 @@ struct CreateSongUseCaseTests {
     func testWhitespaceOnlyTitle() async {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = CreateSongUseCase(repository: mockRepository)
+        let useCase = await CreateSongUseCase(repository: mockRepository)
         
         // When/Then
         await #expect(throws: ValidationError.emptyTitle) {
@@ -79,7 +79,7 @@ struct CreateSongUseCaseTests {
     func testEmptyArtist() async {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = CreateSongUseCase(repository: mockRepository)
+        let useCase = await CreateSongUseCase(repository: mockRepository)
         
         // When/Then
         await #expect(throws: ValidationError.emptyArtist) {
@@ -92,7 +92,7 @@ struct CreateSongUseCaseTests {
     func testWhitespaceOnlyArtist() async {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = CreateSongUseCase(repository: mockRepository)
+        let useCase = await CreateSongUseCase(repository: mockRepository)
         
         // When/Then
         await #expect(throws: ValidationError.emptyArtist) {

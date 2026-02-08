@@ -12,7 +12,7 @@ struct UpdateSongUseCaseTests {
     func testUpdateSongSuccess() async throws {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = UpdateSongUseCase(repository: mockRepository)
+        let useCase = await UpdateSongUseCase(repository: mockRepository)
         let songId = UUID()
 
         // When
@@ -29,7 +29,7 @@ struct UpdateSongUseCaseTests {
     func testTrimWhitespace() async throws {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = UpdateSongUseCase(repository: mockRepository)
+        let useCase = await UpdateSongUseCase(repository: mockRepository)
 
         // When
         let song = try await useCase.execute(id: UUID(), title: "  New Title  ", artist: "  New Artist  ")
@@ -45,7 +45,7 @@ struct UpdateSongUseCaseTests {
     func testEmptyTitle() async {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = UpdateSongUseCase(repository: mockRepository)
+        let useCase = await UpdateSongUseCase(repository: mockRepository)
 
         // When/Then
         await #expect(throws: ValidationError.emptyTitle) {
@@ -57,7 +57,7 @@ struct UpdateSongUseCaseTests {
     @Test("Throws error for whitespace-only title")
     func testWhitespaceOnlyTitle() async {
         let mockRepository = MockSongRepository()
-        let useCase = UpdateSongUseCase(repository: mockRepository)
+        let useCase = await UpdateSongUseCase(repository: mockRepository)
 
         await #expect(throws: ValidationError.emptyTitle) {
             try await useCase.execute(id: UUID(), title: "   ", artist: "Artist")
@@ -69,7 +69,7 @@ struct UpdateSongUseCaseTests {
     func testEmptyArtist() async {
         // Given
         let mockRepository = MockSongRepository()
-        let useCase = UpdateSongUseCase(repository: mockRepository)
+        let useCase = await UpdateSongUseCase(repository: mockRepository)
 
         // When/Then
         await #expect(throws: ValidationError.emptyArtist) {
@@ -81,7 +81,7 @@ struct UpdateSongUseCaseTests {
     @Test("Throws error for whitespace-only artist")
     func testWhitespaceOnlyArtist() async {
         let mockRepository = MockSongRepository()
-        let useCase = UpdateSongUseCase(repository: mockRepository)
+        let useCase = await UpdateSongUseCase(repository: mockRepository)
 
         await #expect(throws: ValidationError.emptyArtist) {
             try await useCase.execute(id: UUID(), title: "Title", artist: "   ")
