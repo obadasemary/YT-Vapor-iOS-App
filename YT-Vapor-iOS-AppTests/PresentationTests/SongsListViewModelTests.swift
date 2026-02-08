@@ -9,10 +9,7 @@ struct SongsListViewModelTests {
     @Test("Initial state is idle")
     @MainActor
     func testInitialStateIsIdle() {
-        let mockUseCase = MockGetSongsUseCase(returning: [])
-        let mockRouter = MockSongsListRouter()
-        let mockBuilder = createMockAddSongBuilder()
-        let viewModel = SongsListViewModel(getSongsUseCase: mockUseCase, router: mockRouter, addSongBuilder: mockBuilder)
+        let viewModel = makeViewModel()
 
         if case .idle = viewModel.state {
             // Success
@@ -28,10 +25,7 @@ struct SongsListViewModelTests {
             Song(id: UUID(), title: "Song 1", artist: "Artist 1"),
             Song(id: UUID(), title: "Song 2", artist: "Artist 2")
         ]
-        let mockUseCase = MockGetSongsUseCase(returning: mockSongs)
-        let mockRouter = MockSongsListRouter()
-        let mockBuilder = createMockAddSongBuilder()
-        let viewModel = SongsListViewModel(getSongsUseCase: mockUseCase, router: mockRouter, addSongBuilder: mockBuilder)
+        let viewModel = makeViewModel(songs: mockSongs)
 
         await viewModel.loadSongs()
 
@@ -48,10 +42,7 @@ struct SongsListViewModelTests {
     @MainActor
     func testLoadSongsWithError() async {
         let expectedError = NetworkError.noData
-        let mockUseCase = MockGetSongsUseCase(throwing: expectedError)
-        let mockRouter = MockSongsListRouter()
-        let mockBuilder = createMockAddSongBuilder()
-        let viewModel = SongsListViewModel(getSongsUseCase: mockUseCase, router: mockRouter, addSongBuilder: mockBuilder)
+        let viewModel = makeViewModel(error: expectedError)
 
         await viewModel.loadSongs()
 
@@ -65,13 +56,8 @@ struct SongsListViewModelTests {
     @Test("State changes from idle to loading to loaded")
     @MainActor
     func testStateTransitions() async {
-        let mockSongs = [Song(id: UUID(), title: "Test", artist: "Artist")]
-        let mockUseCase = MockGetSongsUseCase(returning: mockSongs)
-        let mockRouter = MockSongsListRouter()
-        let mockBuilder = createMockAddSongBuilder()
-        let viewModel = SongsListViewModel(getSongsUseCase: mockUseCase, router: mockRouter, addSongBuilder: mockBuilder)
+        let viewModel = makeViewModel(songs: [Song(id: UUID(), title: "Test", artist: "Artist")])
 
-        // Initial state should be idle
         if case .idle = viewModel.state {
             // Expected
         } else {
@@ -80,7 +66,6 @@ struct SongsListViewModelTests {
 
         await viewModel.loadSongs()
 
-        // After loading should be loaded
         if case .loaded = viewModel.state {
             // Expected
         } else {
@@ -91,10 +76,7 @@ struct SongsListViewModelTests {
     @Test("Loading empty songs list returns loaded state with empty array")
     @MainActor
     func testLoadEmptySongsList() async {
-        let mockUseCase = MockGetSongsUseCase(returning: [])
-        let mockRouter = MockSongsListRouter()
-        let mockBuilder = createMockAddSongBuilder()
-        let viewModel = SongsListViewModel(getSongsUseCase: mockUseCase, router: mockRouter, addSongBuilder: mockBuilder)
+        let viewModel = makeViewModel()
 
         await viewModel.loadSongs()
 
@@ -108,10 +90,8 @@ struct SongsListViewModelTests {
     @Test("Navigating to add song triggers router")
     @MainActor
     func testNavigateToAddSong() {
-        let mockUseCase = MockGetSongsUseCase(returning: [])
         let mockRouter = MockSongsListRouter()
-        let mockBuilder = createMockAddSongBuilder()
-        let viewModel = SongsListViewModel(getSongsUseCase: mockUseCase, router: mockRouter, addSongBuilder: mockBuilder)
+        let viewModel = makeViewModel(router: mockRouter)
 
         viewModel.navigateToAddSong()
 
@@ -122,22 +102,43 @@ struct SongsListViewModelTests {
 // MARK: - Helper Functions
 
 @MainActor
-func createMockAddSongBuilder() -> AddSongBuilder {
-    return AddSongBuilder(
-        container: AppDependencyContainer(),
-        songsListRouter: MockSongsListRouter()
+private func makeViewModel(
+    songs: [Song] = [],
+    error: Error? = nil,
+    router: MockSongsListRouter = MockSongsListRouter()
+) -> SongsListViewModel {
+    let getSongsUseCase = error != nil
+        ? MockGetSongsUseCase(throwing: error!)
+        : MockGetSongsUseCase(returning: songs)
+    let deleteSongUseCase = MockDeleteSongUseCase()
+    let container = AppDependencyContainer()
+    let addSongBuilder = AddSongBuilder(
+        container: container,
+        songsListRouter: router,
+        onSongAdded: {}
+    )
+    return SongsListViewModel(
+        getSongsUseCase: getSongsUseCase,
+        deleteSongUseCase: deleteSongUseCase,
+        router: router,
+        addSongBuilder: addSongBuilder,
+        container: container
     )
 }
 
 // MARK: - Mock Router
 
-@MainActor
 final class MockSongsListRouter: SongsListRouterProtocol {
     var navigateToAddSongCalled = false
+    var navigateToEditSongCalled = false
     var dismissCalled = false
 
-    func navigateToAddSong(builder: AddSongBuilder, onDisappear: @escaping () async -> Void) {
+    func navigateToAddSong(builder: AddSongBuilder) {
         navigateToAddSongCalled = true
+    }
+
+    func navigateToEditSong(builder: EditSongBuilder) {
+        navigateToEditSongCalled = true
     }
 
     func dismiss() {

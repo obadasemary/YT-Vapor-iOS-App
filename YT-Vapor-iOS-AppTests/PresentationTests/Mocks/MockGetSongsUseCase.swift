@@ -31,6 +31,41 @@ final class MockGetSongsUseCase: GetSongsUseCaseProtocol {
     }
 }
 
+/// Mock implementation of UpdateSongUseCase for testing
+final class MockUpdateSongUseCase: UpdateSongUseCaseProtocol {
+    var executeCalled = false
+    var shouldFail = false
+
+    init(shouldFail: Bool = false) {
+        self.shouldFail = shouldFail
+    }
+
+    func execute(id: UUID, title: String, artist: String) async throws -> Song {
+        executeCalled = true
+        if shouldFail {
+            throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to update song"])
+        }
+        return Song(id: id, title: title, artist: artist)
+    }
+}
+
+/// Mock implementation of DeleteSongUseCase for testing
+final class MockDeleteSongUseCase: DeleteSongUseCaseProtocol {
+    var executeCalled = false
+    var shouldFail = false
+
+    init(shouldFail: Bool = false) {
+        self.shouldFail = shouldFail
+    }
+
+    func execute(id: UUID) async throws {
+        executeCalled = true
+        if shouldFail {
+            throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to delete song"])
+        }
+    }
+}
+
 /// Mock implementation of CreateSongUseCase for testing
 ///
 /// This mock allows tests to inject pre-configured responses
