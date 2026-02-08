@@ -105,14 +105,18 @@ struct CreateSongUseCaseTests {
     
     private final class MockSongRepository: SongRepositoryProtocol {
         var createSongCalled = false
-        
-        func fetchSongs() async throws -> [Song] {
-            []
-        }
-        
+
+        func fetchSongs() async throws -> [Song] { [] }
+
         func createSong(title: String, artist: String) async throws -> Song {
             createSongCalled = true
             return Song(id: UUID(), title: title, artist: artist)
         }
+
+        func updateSong(id: UUID, title: String, artist: String) async throws -> Song {
+            Song(id: id, title: title, artist: artist)
+        }
+
+        func deleteSong(id: UUID) async throws {}
     }
 }

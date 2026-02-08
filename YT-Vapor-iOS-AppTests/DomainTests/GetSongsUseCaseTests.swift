@@ -83,7 +83,12 @@ private final class MockSongRepository: SongRepositoryProtocol {
     }
 
     func createSong(title: String, artist: String) async throws -> Song {
-        // Not used in GetSongsUseCase tests, but required by protocol
-        return Song(id: UUID(), title: title, artist: artist)
+        Song(id: UUID(), title: title, artist: artist)
     }
+
+    func updateSong(id: UUID, title: String, artist: String) async throws -> Song {
+        Song(id: id, title: title, artist: artist)
+    }
+
+    func deleteSong(id: UUID) async throws {}
 }
