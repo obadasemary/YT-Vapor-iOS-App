@@ -15,7 +15,7 @@ struct SongRepositoryTests {
             SongDTO(id: uuid2.uuidString, title: "Song 2", artist: "Artist 2")
         ]
         let mockClient = MockHTTPClient(returning: mockDTOs)
-        let repository = SongRepository(httpClient: mockClient)
+        let repository = await SongRepository(httpClient: mockClient)
 
         let songs = try await repository.fetchSongs()
 
@@ -30,7 +30,7 @@ struct SongRepositoryTests {
     @Test("Throws error when HTTP client fails")
     func testThrowsErrorWhenHTTPClientFails() async {
         let mockClient = MockHTTPClient(throwing: NetworkError.noData)
-        let repository = SongRepository(httpClient: mockClient)
+        let repository = await SongRepository(httpClient: mockClient)
 
         do {
             _ = try await repository.fetchSongs()
@@ -48,7 +48,7 @@ struct SongRepositoryTests {
             SongDTO(id: "invalid-uuid", title: "Invalid Song", artist: "Artist 2")
         ]
         let mockClient = MockHTTPClient(returning: mockDTOs)
-        let repository = SongRepository(httpClient: mockClient)
+        let repository = await SongRepository(httpClient: mockClient)
 
         let songs = try await repository.fetchSongs()
 
@@ -64,7 +64,7 @@ struct SongRepositoryTests {
             SongDTO(id: "invalid-2", title: "Song 2", artist: "Artist 2")
         ]
         let mockClient = MockHTTPClient(returning: mockDTOs)
-        let repository = SongRepository(httpClient: mockClient)
+        let repository = await SongRepository(httpClient: mockClient)
 
         let songs = try await repository.fetchSongs()
 
@@ -75,7 +75,7 @@ struct SongRepositoryTests {
     func testReturnsEmptyArrayForEmptyResponse() async throws {
         let mockDTOs: [SongDTO] = []
         let mockClient = MockHTTPClient(returning: mockDTOs)
-        let repository = SongRepository(httpClient: mockClient)
+        let repository = await SongRepository(httpClient: mockClient)
 
         let songs = try await repository.fetchSongs()
 
