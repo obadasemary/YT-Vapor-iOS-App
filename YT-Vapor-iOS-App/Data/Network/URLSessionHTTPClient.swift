@@ -86,4 +86,68 @@ final class URLSessionHTTPClient: HTTPClient {
             throw NetworkError.decodingError
         }
     }
+
+    /// Puts (updates) data at a URL and decodes the response
+    /// - Parameters:
+    ///   - data: The encodable data to send
+    ///   - url: The URL to put to
+    /// - Returns: A decoded object of type T
+    /// - Throws: NetworkError for various failure scenarios
+    func put<T: Decodable, U: Encodable>(_ data: U, to url: URL) async throws -> T {
+        // Create request
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // Encode the body
+        do {
+            let encoder = JSONEncoder()
+            request.httpBody = try encoder.encode(data)
+        } catch {
+            throw NetworkError.encodingError
+        }
+
+        // Perform the network request
+        let (responseData, response) = try await session.data(for: request)
+
+        // Validate HTTP response
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.underlying(URLError(.badServerResponse))
+        }
+
+        // Check for successful status code (200-299)
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw NetworkError.httpError(statusCode: httpResponse.statusCode)
+        }
+
+        // Decode the JSON response
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode(T.self, from: responseData)
+        } catch {
+            throw NetworkError.decodingError
+        }
+    }
+
+    /// Deletes a resource at a URL
+    /// - Parameter url: The URL to delete from
+    /// - Throws: NetworkError for various failure scenarios
+    func delete(from url: URL) async throws {
+        // Create request
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+
+        // Perform the network request
+        let (_, response) = try await session.data(for: request)
+
+        // Validate HTTP response
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.underlying(URLError(.badServerResponse))
+        }
+
+        // Check for successful status code (200-299)
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw NetworkError.httpError(statusCode: httpResponse.statusCode)
+        }
+    }
 }
