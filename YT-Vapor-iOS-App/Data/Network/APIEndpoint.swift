@@ -6,6 +6,7 @@ import Foundation
 /// to modify base URLs, paths, or add new endpoints.
 enum APIEndpoint {
     case songs
+    case song(id: UUID)
 
     /// The base URL for the API
     /// TODO: Replace with your actual Vapor backend URL
@@ -19,6 +20,8 @@ enum APIEndpoint {
         switch self {
         case .songs:
             return "songs"
+        case .song(let id):
+            return "songs/\(id.uuidString)"
         }
     }
 
