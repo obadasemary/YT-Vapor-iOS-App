@@ -47,14 +47,15 @@ final class SongsListBuilder {
             container: container,
             songsListRouter: songsListRouter,
             onSongAdded: {
-                await viewModel.loadSongs()
+                await viewModel.refreshSongs()
             }
         )
         
         // Create viewModel
         viewModel = container.makeSongsListViewModel(
             router: songsListRouter,
-            addSongBuilder: addSongBuilder
+            addSongBuilder: addSongBuilder,
+            container: container
         )
 
         return SongsListView(

@@ -25,54 +25,62 @@ struct SongsListView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                // Background color
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-
-                // Content
-                switch viewModel.state {
-                case .idle:
-                    Color.clear
-//                        .onAppear {
-//                            // Load songs when view appears
-//                            Task {
-//                                await viewModel.loadSongs()
-//                            }
-//                        }
-
-                case .loading:
-                    loadingView
-
-                case .loaded(let songs):
-                    if songs.isEmpty {
-                        EmptyStateView()
-                    } else {
-                        songsListView(songs: songs)
-                    }
-
-                case .error(let error):
-                    errorView(error: error)
-                }
-            }
-            .navigationTitle("Songs")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        viewModel.navigateToAddSong()
-                    } label: {
-                        Image(systemName: "plus")
-                            .fontWeight(.semibold)
+            contentView
+                .navigationTitle("Songs")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            viewModel.navigateToAddSong()
+                        } label: {
+                            Image(systemName: "plus")
+                                .fontWeight(.semibold)
+                        }
                     }
                 }
-            }
         }
         .task {
             await viewModel.loadSongs()
         }
-        .refreshable {
-            await viewModel.loadSongs()
+        .alert(
+            "Delete Song",
+            isPresented: Binding(
+                get: { viewModel.songPendingDeletion != nil },
+                set: { if !$0 { viewModel.songPendingDeletion = nil } }
+            ),
+            presenting: viewModel.songPendingDeletion
+        ) { song in
+            Button("Delete", role: .destructive) {
+                Task {
+                    await viewModel.deleteSong(song)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { song in
+            Text("Are you sure you want to delete \"\(song.title)\"? This action cannot be undone.")
+        }
+    }
+
+    // MARK: - Content View
+
+    @ViewBuilder
+    private var contentView: some View {
+        switch viewModel.state {
+        case .idle:
+            Color(.systemGroupedBackground).ignoresSafeArea()
+
+        case .loading:
+            loadingView
+
+        case .loaded(let songs):
+            if songs.isEmpty {
+                EmptyStateView()
+            } else {
+                songsListView(songs: songs)
+            }
+
+        case .error(let error):
+            errorView(error: error)
         }
     }
 
@@ -92,19 +100,28 @@ struct SongsListView: View {
     // MARK: - Songs List View
 
     private func songsListView(songs: [Song]) -> some View {
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                ForEach(songs) { song in
-                    SongRowView(song: song)
-                        .transition(.asymmetric(
-                            insertion: .scale(scale: 0.95).combined(with: .opacity),
-                            removal: .opacity
-                        ))
-                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: songs)
-                }
+        List {
+            ForEach(songs) { song in
+                SongRowView(song: song)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .onTapGesture {
+                        viewModel.navigateToEditSong(song)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            viewModel.confirmDeleteSong(song)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
             }
-            .padding(.top, 8)
-            .padding(.bottom, 16)
+        }
+        .listStyle(.plain)
+        .background(Color(.systemGroupedBackground))
+        .refreshable {
+            await viewModel.refreshSongs()
         }
     }
 
@@ -262,9 +279,17 @@ private final class MockSongRepository: SongRepositoryProtocol {
     }
     
     func createSong(title: String, artist: String) async throws -> Song {
-        // Simulate network delay
         try await Task.sleep(for: .seconds(1))
         return Song(id: UUID(), title: title, artist: artist)
+    }
+
+    func updateSong(id: UUID, title: String, artist: String) async throws -> Song {
+        try await Task.sleep(for: .seconds(1))
+        return Song(id: id, title: title, artist: artist)
+    }
+
+    func deleteSong(id: UUID) async throws {
+        try await Task.sleep(for: .seconds(1))
     }
 }
 

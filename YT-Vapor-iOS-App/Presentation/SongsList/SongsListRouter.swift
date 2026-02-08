@@ -9,6 +9,10 @@ protocol SongsListRouterProtocol {
     /// - Parameter builder: Builder for creating the Add Song view
     func navigateToAddSong(builder: AddSongBuilder)
 
+    /// Navigate to the Edit Song screen
+    /// - Parameter builder: Builder for creating the Edit Song view
+    func navigateToEditSong(builder: EditSongBuilder)
+
     /// Dismiss the current presentation
     func dismiss()
 }
@@ -44,6 +48,14 @@ final class SongsListRouter: SongsListRouterProtocol {
     /// Navigate to the Add Song screen
     /// - Parameter builder: Builder for creating the Add Song view
     func navigateToAddSong(builder: AddSongBuilder) {
+        router.showScreen(.sheet) { router in
+            builder.build()
+        }
+    }
+
+    /// Navigate to the Edit Song screen
+    /// - Parameter builder: Builder for creating the Edit Song view
+    func navigateToEditSong(builder: EditSongBuilder) {
         router.showScreen(.sheet) { router in
             builder.build()
         }
