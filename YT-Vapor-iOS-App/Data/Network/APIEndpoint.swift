@@ -12,7 +12,7 @@ enum APIEndpoint {
     /// TODO: Replace with your actual Vapor backend URL
     /// For production, consider using environment variables or a configuration file
     var baseURL: String {
-        "https://localhost:8080/"
+        "http://localhost:8080/"
     }
 
     /// The path component for this specific endpoint
