@@ -123,6 +123,10 @@ iOSInjectionProject/
 Config.xcconfig
 Secrets.plist
 
+# Environment-specific configuration (use templates instead)
+**/Config.plist
+**/Info.plist
+
 # Temporary files
 *.swp
 *~.nib

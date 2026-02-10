@@ -2,17 +2,15 @@ import Foundation
 
 /// Defines API endpoints with configuration
 ///
-/// This enum centralizes all API endpoint configuration, making it easy
-/// to modify base URLs, paths, or add new endpoints.
+/// This enum centralizes all API endpoint configuration.
+/// Base URL is loaded from Config.plist (gitignored) for environment-specific settings.
 enum APIEndpoint {
     case songs
     case song(id: UUID)
 
-    /// The base URL for the API
-    /// TODO: Replace with your actual Vapor backend URL
-    /// For production, consider using environment variables or a configuration file
+    /// The base URL for the API, loaded from AppConfiguration
     var baseURL: String {
-        "http://localhost:8080/"
+        AppConfiguration.shared.apiBaseURL
     }
 
     /// The path component for this specific endpoint

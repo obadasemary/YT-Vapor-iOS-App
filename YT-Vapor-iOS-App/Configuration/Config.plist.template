@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_BASE_URL</key>
+	<string>http://localhost:8080/</string>
+	<key>HTTP_EXCEPTION_DOMAINS</key>
+	<array>
+		<string>localhost</string>
+	</array>
+	<!--
+	INSTRUCTIONS:
+	1. Copy this file to Config.plist
+	2. Update API_BASE_URL with your backend server URL
+	3. Add any domains that need HTTP exceptions to HTTP_EXCEPTION_DOMAINS array
+	4. Config.plist is gitignored - your settings stay private
+
+	Example for production:
+	<key>API_BASE_URL</key>
+	<string>https://api.yourserver.com/</string>
+	<key>HTTP_EXCEPTION_DOMAINS</key>
+	<array>
+		<string>api.yourserver.com</string>
+	</array>
+	-->
+</dict>
+</plist>
